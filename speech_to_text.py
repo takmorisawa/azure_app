@@ -17,13 +17,15 @@ def test():
     # with open("test.wav","wb") as f:
     #     f.write(data)
 
-    speech_text_url="https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=ja-JP&local=ja-JP"
+    speech_text_url="https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=ja-JP&format=detailed"
     headers={
         "Ocp-Apim-Subscription-Key":"9c9c8c950a5042328ab194953df08cd0",
-        "Content-type":'audio/wav; codec="audio/pcm";  samplerate=22000'
+        "Content-type":'audio/wav; codec="audio/pcm";  samplerate=22000',
+        "Accept":"application/json"
         }
     response=requests.post(speech_text_url,data=data,headers=headers)
     print(response.text)
+
 
 if __name__=="__main__":
     # get_token(subscription_key)
