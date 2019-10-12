@@ -55,9 +55,19 @@ def record(all,recording):
     )
 
     #all = []
+    counter=0
     for i in range(0, int(RATE / chunk * RECORD_SECONDS)):
         data = stream.read(chunk)
-        all.append(data)
+
+        x = np.frombuffer(data, dtype="int16")
+        if max(x)>1000:
+            print("record!")
+            counter=int(RATE / chunk * 3)
+
+        if counter>0:
+            all.append(data)
+            counter-=1
+
 
     stream.close()
     p.terminate()
@@ -91,7 +101,7 @@ def audio_test():
     plt.figure(figsize=(15,3))
     while(recording[0]):
         graph_data = b''.join(all)
-        x = np.frombuffer(graph_data, dtype="int16") / 32768.0
+        x = np.frombuffer(graph_data, dtype="int16")
         x=x[-min(8000*3,len(x)):]
 
         plt.clf()
