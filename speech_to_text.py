@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import copy
 import threading
 
-subscription_key="7cb9a1e89af7482cbe0089c3528a05a8"
+subscription_key="9c9c8c950a5042328ab194953df08cd0"
 
 def get_token(key):
     token_url="https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken"
@@ -18,9 +18,9 @@ def get_token(key):
     print(accsess_token)
 
 
-def speech_to_text():
+def speech_to_text(file_path,key,rate):
     data=[]
-    with open("sample001.wav","rb") as f:
+    with open(file_path,"rb") as f:
         data=f.read()
 
     # with open("test.wav","wb") as f:
@@ -28,8 +28,8 @@ def speech_to_text():
 
     speech_text_url="https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=ja-JP&format=detailed"
     headers={
-        "Ocp-Apim-Subscription-Key":"9c9c8c950a5042328ab194953df08cd0",
-        "Content-type":'audio/wav; codec="audio/pcm";  samplerate=22000',
+        "Ocp-Apim-Subscription-Key":key,
+        "Content-type":'audio/wav; codec="audio/pcm";  samplerate={0}'.format(rate),
         "Accept":"application/json"
         }
     response=requests.post(speech_text_url,data=data,headers=headers)
@@ -68,9 +68,16 @@ def record(all,recording):
             all.append(data)
             counter-=1
 
-
     stream.close()
     p.terminate()
+
+    wf = wave.open("rec.wav", 'wb')
+    wf.setnchannels(CHANNELS)
+    wf.setsampwidth(p.get_sample_size(FORMAT))
+    wf.setframerate(RATE)
+    wf.writeframes(b''.join(all))
+    wf.close()
+
     recording[0]=False
 
     # data = b''.join(all)
@@ -108,8 +115,10 @@ def audio_test():
         plt.plot(x)
         plt.pause(0.1)
 
+    speech_to_text("rec.wav",subscription_key,8000)
+
 
 if __name__=="__main__":
     # get_token(subscription_key)
-    # speech_to_text()
+    # speech_to_text("sample001.wav")
     audio_test()
