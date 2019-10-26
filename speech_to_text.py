@@ -36,8 +36,38 @@ def speech_to_text(file_path,key,rate):
     print(response.text)
 
 
+def speech_to_text_chunk(data,key,rate,is_first=False):
+    speech_text_url="https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=ja-JP&format=detailed"
+    headers={
+        "Ocp-Apim-Subscription-Key":key,
+        "Content-type":'audio/wav; codec="audio/pcm";  samplerate={0}'.format(rate),
+        "Accept":"application/json",
+        "Transfer-Encoding":"chunked"
+        }
+    # if is_first:
+    #     headers["Expect"]="100-continue"
+
+    response=requests.post(speech_text_url,data=data,headers=headers)
+    print(response)
+
+
+def chunk_test(file_path,key,rate):
+    fdata=[]
+    with open(file_path,"rb") as f:
+        fdata=f.read()
+
+    hdata=fdata[0:44]
+    data=fdata[44:]
+
+    # speech_to_text(file_path,key,rate)
+    speech_to_text_chunk(fdata,key,rate,True)
+    # speech_to_text_chunk(data,key,rate,True)
+    # speech_to_text_chunk(data,key,rate,True)
+    # speech_to_text_chunk(data,key,rate)
+
+
 def record(all,recording):
-    chunk = 1024
+    chunk = 1024 * 16
     FORMAT = pyaudio.paInt16
     CHANNELS = 1
     #RATE = 44100
@@ -63,10 +93,16 @@ def record(all,recording):
         if max(x)>1000:
             print("record!")
             counter=int(RATE / chunk * 3)
+            # speech_to_text("rec.wav",subscription_key,RATE)
 
         if counter>0:
             all.append(data)
+            # thread=threading.Thread(target=speech_to_text_chunk,args=([data,subscription_key,RATE,True]))
+            # thread.start()
+            #speech_to_text_chunk(data,subscription_key,RATE,True)
             counter-=1
+
+# speech_to_text_chunk(b"",subscription_key,RATE)
 
     stream.close()
     p.terminate()
@@ -115,10 +151,12 @@ def audio_test():
         plt.plot(x)
         plt.pause(0.1)
 
-    speech_to_text("rec.wav",subscription_key,8000)
+    # speech_to_text("rec.wav",subscription_key,8000)
+    # speech_to_text_chunk(all,subscription_key,8000)
 
 
 if __name__=="__main__":
     # get_token(subscription_key)
-    # speech_to_text("sample001.wav")
-    audio_test()
+    # speech_to_text("sample001.wav",subscription_key,8000)
+    # audio_test()
+    chunk_test("rec.wav",subscription_key,8000)
