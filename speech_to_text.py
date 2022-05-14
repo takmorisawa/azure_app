@@ -7,8 +7,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import copy
 import threading
+import json
 
-subscription_key="9c9c8c950a5042328ab194953df08cd0"
+config=None
+with open("config.json") as f:
+    config=json.load(f)
+subscription_key=config["subscription_key"]
 
 def get_token(key):
     token_url="https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken"
